@@ -3,25 +3,64 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isValidEmail, setIsValidEmail] = useState(true);
+  const [isValidPassword, setIsValidPassword] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleCredentialsLogin = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-    await signIn("credentials", {
-      email,
-      password,
-      redirect: true,
-      callbackUrl: "/",
-    });
+
+    const emailValid = emailRegex.test(email);
+    const passwordValid = passwordRegex.test(password);
+
+    setIsValidEmail(emailValid);
+    setIsValidPassword(passwordValid);
+
+    if (!emailValid || !passwordValid) {
+      console.log("Form invalid");
+      return;
+    }
+
+    try {
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: true,
+        callbackUrl: "/topics",
+      });
+
+      console.log(res);
+      
+
+      if (res?.error) {
+        console.log("Login failed : ", res.error);
+      } else {
+        router.push(res?.url || "/topics");
+      }
+    } catch (error) {
+      console.error("Auth error", error);
+      alert("Authentication Failed. Please check your credentials.");
+    }
+
+    // Proceed with form submission
+    console.log("Form submitted: ", { email, password });
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-[100vh]">
       {/* Left Side - Product Showcase */}
       <div className="flex-1 bg-gradient-to-br from-black via-gray-900 to-slate-800 flex flex-col items-center justify-center p-8 relative overflow-hidden">
         {/* Background decorative elements */}
@@ -48,13 +87,18 @@ export default function SignIn() {
 
           {/* Tagline */}
           <p className="text-2xl font-light text-gray-300 max-w-md mx-auto leading-relaxed">
-            <span className="font-semibold text-orange-400">Your Podcasts</span>{" "}
-            and
-            <span className="font-semibold text-orange-500">
-              {" "}
-              Your Topics
-            </span>{" "}
-            - All in{" "}
+            <div>
+              <span className="font-semibold text-orange-400">
+                Your Podcasts
+              </span>{" "}
+              and
+              <span className="font-semibold text-orange-500">
+                {" "}
+                Your Topics
+              </span>{" "}
+              -
+            </div>
+            All in{" "}
             <span className="font-semibold text-orange-600">One Place</span>
           </p>
         </div>
@@ -73,7 +117,7 @@ export default function SignIn() {
 
             {/* Google Login */}
             <button
-              onClick={() => signIn("google", { callbackUrl: "/" })}
+              onClick={() => signIn("google")}
               className="w-full mb-6 py-3 px-4 bg-white text-black font-semibold rounded-xl hover:bg-gray-100 transition-all duration-300 flex items-center justify-center gap-3 shadow-lg"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -118,11 +162,24 @@ export default function SignIn() {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl 
-                 text-white placeholder-gray-400 focus:border-orange-500 
-                 focus:ring-1 focus:ring-orange-500 transition-all duration-300"
+                  className={`w-full px-4 py-3 bg-gray-800/50 rounded-xl 
+                text-white placeholder-gray-400  focus:outline-none 
+                  transition-all duration-300
+                  border
+                  focus:ring-1
+                  ${
+                    isValidEmail
+                      ? "focus:ring-orange-500"
+                      : "focus:ring-red-900"
+                  }`}
                   required
                 />
+
+                {!isValidEmail && (
+                  <p className="text-red-600 text-sm mt-1 text-left">
+                    Invalid email format
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col space-y-2">
@@ -132,17 +189,44 @@ export default function SignIn() {
                 >
                   Password
                 </label>
-                <input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl 
-                 text-white placeholder-gray-400 focus:border-orange-500 
-                 focus:ring-1 focus:ring-orange-500 transition-all duration-300"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={`w-full px-4 py-3 bg-gray-800/50 border rounded-xl 
+                  text-white placeholder-gray-400 focus:outline-none 
+                    transition-all duration-300 
+                    focus:ring-1 ${
+                      isValidPassword
+                        ? "focus:ring-orange-500"
+                        : "focus:ring-red-500"
+                    }`}
+                    required
+                  />
+
+                  {password && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-transparent focus:outline-none"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-600" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-600" />
+                      )}
+                    </button>
+                  )}
+                </div>
+
+                {!isValidPassword && (
+                  <p className="text-red-600 text-sm mt-1 text-left">
+                    Invalid password format
+                  </p>
+                )}
               </div>
 
               <button

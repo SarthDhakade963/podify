@@ -25,18 +25,22 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email && !credentials?.password) return null;
         try {
           // when the user wants to log in
-          const res = await fetch(`${process.env.SPRING_BASE_URL}/auth/login`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
-          });
+          const res = await fetch(
+            `${process.env.SPRING_BASE_URL}/api/auth/login`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+              credentials: "include",
+            }
+          );
 
-          console.log("Response status: ", res.status);
+          console.log("Response status: ", res);
 
           if (!res.ok) {
             const text = await res.text();
@@ -91,7 +95,7 @@ export const authOptions: NextAuthOptions = {
       if (account && profile && !token.accessToken) {
         try {
           const res = await fetch(
-            `${process.env.SPRING_BASE_URL}/auth/oauth-login`,
+            `${process.env.SPRING_BASE_URL}/api/auth/oauth-login`,
             {
               method: "POST",
               headers: {
@@ -102,6 +106,7 @@ export const authOptions: NextAuthOptions = {
                 provider: account.provider,
                 providerId: account.providerAccountId,
               }),
+              credentials: "include", // important to include cookies
             }
           );
 
