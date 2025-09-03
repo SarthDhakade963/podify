@@ -39,7 +39,7 @@ const topicsList: Topic[] = [
 ];
 
 const TopicPage = () => {
-  const { data: session, status } = useSession();
+  const {  status } = useSession();
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
