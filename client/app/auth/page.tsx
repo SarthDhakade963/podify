@@ -2,9 +2,9 @@
 
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -18,45 +18,46 @@ export default function SignIn() {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const handleCredentialsLogin = async (
-    e: React.FormEvent<HTMLFormElement>
+  const handleLogin = async (
+    provider: "credentials" | "google",
+    e?: React.FormEvent<HTMLFormElement>
   ) => {
-    e.preventDefault();
-
-    const emailValid = emailRegex.test(email);
-    const passwordValid = passwordRegex.test(password);
-
-    setIsValidEmail(emailValid);
-    setIsValidPassword(passwordValid);
-
-    if (!emailValid || !passwordValid) {
-      console.log("Form invalid");
-      return;
-    }
+    if (e) e.preventDefault();
 
     try {
-      const res = await signIn("credentials", {
-        email,
-        password,
-        redirect: true,
-        callbackUrl: "/topics",
-      });
+      if (provider === "credentials") {
+        const emailValid = emailRegex.test(email);
+        const passwordValid = passwordRegex.test(password);
 
-      console.log(res);
-      
+        setIsValidEmail(emailValid);
+        setIsValidPassword(passwordValid);
 
-      if (res?.error) {
-        console.log("Login failed : ", res.error);
-      } else {
-        router.push(res?.url || "/topics");
+        if (!emailValid || !passwordValid) {
+          console.log("Form invalid");
+          return;
+        }
+
+        const res = await signIn("credentials", {
+          email,
+          password,
+          redirect: false, // use router manually
+        });
+
+        if (res?.error) {
+          console.log("Login failed : ", res.error);
+          alert("Invalid email or password");
+        } else {
+          router.push("/topics");
+        }
+      }
+
+      if (provider === "google") {
+        await signIn("google", { callbackUrl: "/topics" });
       }
     } catch (error) {
       console.error("Auth error", error);
-      alert("Authentication Failed. Please check your credentials.");
+      alert("Authentication Failed. Please try again.");
     }
-
-    // Proceed with form submission
-    console.log("Form submitted: ", { email, password });
   };
 
   return (
@@ -87,17 +88,14 @@ export default function SignIn() {
 
           {/* Tagline */}
           <p className="text-2xl font-light text-gray-300 max-w-md mx-auto leading-relaxed">
-            <div>
-              <span className="font-semibold text-orange-400">
-                Your Podcasts
-              </span>{" "}
-              and
-              <span className="font-semibold text-orange-500">
-                {" "}
-                Your Topics
-              </span>{" "}
-              -
-            </div>
+            <span className="font-semibold text-orange-400">Your Podcasts</span>{" "}
+            and
+            <span className="font-semibold text-orange-500">
+              {" "}
+              Your Topics
+            </span>{" "}
+            -
+            <br />
             All in{" "}
             <span className="font-semibold text-orange-600">One Place</span>
           </p>
@@ -117,7 +115,7 @@ export default function SignIn() {
 
             {/* Google Login */}
             <button
-              onClick={() => signIn("google")}
+              onClick={() => handleLogin("google")}
               className="w-full mb-6 py-3 px-4 bg-white text-black font-semibold rounded-xl hover:bg-gray-100 transition-all duration-300 flex items-center justify-center gap-3 shadow-lg"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -148,7 +146,10 @@ export default function SignIn() {
             </div>
 
             {/* Credentials Form */}
-            <form onSubmit={handleCredentialsLogin} className="space-y-5">
+            <form
+              onSubmit={(e) => handleLogin("credentials", e)}
+              className="space-y-5"
+            >
               <div className="flex flex-col space-y-2">
                 <label
                   htmlFor="email"

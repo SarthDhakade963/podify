@@ -26,7 +26,7 @@ export const authOptions: NextAuthOptions = {
         try {
           // when the user wants to log in
           const res = await fetch(
-            `${process.env.SPRING_BASE_URL}/api/auth/login`,
+            `${process.env.NEXT_PUBLIC_SPRING_BASE_URL}/auth/login`,
             {
               method: "POST",
               headers: {
@@ -95,7 +95,7 @@ export const authOptions: NextAuthOptions = {
       if (account && profile && !token.accessToken) {
         try {
           const res = await fetch(
-            `${process.env.SPRING_BASE_URL}/api/auth/oauth-login`,
+            `${process.env.NEXT_PUBLIC_SPRING_BASE_URL}/auth/oauth-login`,
             {
               method: "POST",
               headers: {
@@ -131,14 +131,6 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
 
-    async redirect({ url, baseUrl }) {
-      // if error is in URL, redirect to /home
-      if (url.includes("error=OAuthCallback")) {
-        return `https://localhost:3000/home`;
-      }
-
-      return baseUrl;
-    },
   },
 
   secret: process.env.NEXTAUTH_SECRET,

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BACKEND_URL = process.env.SPRING_BASE_URL;
+const BACKEND_URL = process.env.NEXT_PUBLIC_SPRING_BASE_URL;
 
 const API = axios.create({
   baseURL: BACKEND_URL,

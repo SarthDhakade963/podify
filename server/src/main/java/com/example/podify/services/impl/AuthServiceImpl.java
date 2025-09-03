@@ -40,9 +40,8 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         User savedUser = userRepository.save(user);
-        System.out.println("Saved oAuth user: " + savedUser);
 
-        return Optional.of(UserMapper.toDTO(user));
+        return Optional.of(UserMapper.toDTO(savedUser));
     }
 
     @Transactional

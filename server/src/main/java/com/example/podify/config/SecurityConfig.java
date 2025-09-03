@@ -6,6 +6,7 @@ import com.example.podify.model.User;
 import com.example.podify.security.JwtFilter;
 import com.example.podify.security.JwtUtil;
 import com.example.podify.services.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -45,23 +47,31 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(cors -> {})
+                .cors(cors -> cors.configurationSource(corsConfiguration()))
                 .csrf(AbstractHttpConfigurer::disable) // cross site request forgery
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/").authenticated()
+                                .requestMatchers("/api/**", "/api/topic/**").authenticated()
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(oAuth ->
-                                                                    oAuth.userInfoEndpoint(userInfo
-                                                                            -> userInfo.userService(oAuth2UserService())
-                                                                    )
-                                                                            .successHandler(oAuth2SuccessHandler())
-                ).sessionManagement(session ->
+                        oAuth.userInfoEndpoint(userInfo
+                        -> userInfo.userService(oAuth2UserService())
+                )
+                .successHandler(oAuth2SuccessHandler()))
+                .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            // Return 401 JSON instead of redirecting
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                        })
+                )
                 .build();
     }
 
@@ -74,11 +84,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfiguration() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of(clientUrl));
+        config.setAllowedOrigins(Collections.singletonList(clientUrl));
 
         config.setAllowedHeaders(List.of("*"));
 
-        config.setAllowedMethods(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
         config.setAllowCredentials(true); // important when using cookies
 

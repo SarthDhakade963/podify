@@ -33,8 +33,6 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginReq) {
 
-        System.out.println("Login Request : " + loginReq);
-
         return authService.validateCredentials(loginReq).map(userDTO -> {
             String token = jwtUtil.generateToken(userDTO.getId(), userDTO.getEmail());
 

@@ -9,10 +9,13 @@ export async function fetchWithToken(input: RequestInfo, init?: RequestInit) {
 
   headers.set("Content-Type", "application/json");
 
-  const res = await fetch(`${process.env.SPRING_BASE_URL}${input}`, {
-    ...init,
-    headers,
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SPRING_BASE_URL}${input}`,
+    {
+      ...init,
+      headers,
+    }
+  );
 
   if (!res.ok) throw new Error(await res.text());
 
