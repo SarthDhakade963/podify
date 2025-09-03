@@ -32,4 +32,5 @@ build/
 ### VS Code ###
 .vscode/
 
-C:\Full-Cycle-Project\podify\server\src\main\resources\application.properties
+# Ignore local application properties
+src\main\resources\application.properties
