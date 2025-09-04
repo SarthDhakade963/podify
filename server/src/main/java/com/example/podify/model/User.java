@@ -32,4 +32,16 @@ public class User extends Auditable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Topic> topics = new ArrayList<>();
 
+    @ToString.Exclude
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Playlist> playlists = new ArrayList<>();
+
+    @ToString.Exclude
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WatchHistory> watchHistory = new ArrayList<>();
+
+
+
 }

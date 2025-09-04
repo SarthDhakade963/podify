@@ -2,7 +2,9 @@ package com.example.podify.mapper;
 
 import com.example.podify.dto.TopicDTO;
 import com.example.podify.model.Topic;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TopicMapper {
     public static TopicDTO toDTO(Topic topic) {
         return TopicDTO.builder()

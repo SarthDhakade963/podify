@@ -1,7 +1,7 @@
 package com.example.podify.services;
 
 import com.example.podify.model.User;
-import com.example.podify.repository.UserRepository;
+import com.example.podify.repository.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 

@@ -5,7 +5,7 @@ import com.example.podify.dto.AuthDTO.OAuthLoginRequestDTO;
 import com.example.podify.dto.UserDTO;
 import com.example.podify.mapper.UserMapper;
 import com.example.podify.model.User;
-import com.example.podify.repository.UserRepository;
+import com.example.podify.repository.jpa.UserRepository;
 import com.example.podify.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

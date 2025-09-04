@@ -4,7 +4,10 @@ import com.example.podify.dto.AuthDTO.AuthResponseDTO;
 import com.example.podify.dto.AuthDTO.OAuthLoginRequestDTO;
 import com.example.podify.dto.UserDTO;
 import com.example.podify.model.User;
+import jakarta.persistence.Column;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserMapper {
     public static AuthResponseDTO toAuthResponse(UserDTO user, String token) {
         return new AuthResponseDTO(
