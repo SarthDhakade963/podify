@@ -13,5 +13,4 @@ public interface PodcastService {
     Optional<PodcastDTO> getById(String id);
 
     PodcastDTO save(PodcastDTO podcastDTO);
-
 }

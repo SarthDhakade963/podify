@@ -1,5 +1,10 @@
-import HomePage from "@/component/HomePage";
+"use client";
+import dynamic from "next/dynamic";
 import React from "react";
+
+const HomePage = dynamic(() => import("@/component/HomePage"), {
+  ssr: false,
+});
 
 const page = () => {
   return <HomePage />;

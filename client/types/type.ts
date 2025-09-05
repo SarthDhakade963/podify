@@ -5,15 +5,15 @@ export interface Topic {
 }
 
 
-export type Podcast = {
-  id: string; // internal id (Mongo id) or fallback to videoId
-  videoId: string;
+// types/podcast.ts
+export interface Podcast {
+  id: string;
   title: string;
-  channelTitle: string;
-  durationSec?: number;
-  publishedAt?: string;
-  thumbnailUrl: string;
-  topic?: string;
-  hasTranscript?: boolean;
-  description?: string;
-};
+  thumbnail: string;
+  channel: string;
+  duration: string;
+  topicName: string;
+  description: string;
+  videoUrl: string;
+  transcript?: string;
+}

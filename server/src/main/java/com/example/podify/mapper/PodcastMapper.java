@@ -12,12 +12,10 @@ public class PodcastMapper {
                 .id(podcast.getId())
                 .title(podcast.getTitle())
                 .channel(podcast.getChannel())
-                .duration(podcast.getDuration())
                 .thumbnail(podcast.getThumbnail())
                 .topicName(podcast.getTopicName())
                 .description(podcast.getDescription())
                 .videoUrl(podcast.getVideoUrl())
-                .transcript(podcast.getTranscript())
                 .build();
     }
 
@@ -26,11 +24,9 @@ public class PodcastMapper {
                 .id(podcastDTO.getId())
                 .title(podcastDTO.getTitle())
                 .channel(podcastDTO.getChannel())
-                .duration(podcastDTO.getDuration())
                 .thumbnail(podcastDTO.getThumbnail())
                 .topicName(podcastDTO.getTopicName())
                 .description(podcastDTO.getDescription())
-                .transcript(podcastDTO.getTranscript())
                 .videoUrl(podcastDTO.getVideoUrl())
                 .build();
     }

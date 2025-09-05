@@ -16,9 +16,7 @@ public class PodcastDTO {
     private String title;
     private String thumbnail;
     private String channel;
-    private String duration;
     private String topicName; // name of the topic
     private String description;
     private String videoUrl;
-    private String transcript;
 }

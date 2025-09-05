@@ -9,31 +9,48 @@ import com.example.podify.repository.mongo.PodcastRepository;
 import com.example.podify.repository.jpa.UserRepository;
 import com.example.podify.services.PodcastService;
 import com.example.podify.services.Signable;
+import com.example.podify.services.YouTubeService;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PodcastServiceImpl extends Signable implements PodcastService {
     private final PodcastRepository podcastRepository;
+    private final YouTubeService youTubeService;
 
-    public PodcastServiceImpl(UserRepository userRepository, PodcastRepository podcastRepository) {
+    public PodcastServiceImpl(UserRepository userRepository, PodcastRepository podcastRepository, YouTubeService youTubeService) {
         super(userRepository);
         this.podcastRepository = podcastRepository;
+        this.youTubeService = youTubeService;
     }
 
     @Override
     public Map<String, List<PodcastDTO>> getPodcastsByTopics() {
         User user = getLoggedInUser();
+
+        // Get user-selected topics from PostgreSQL
         List<Topic> topics = user.getTopics();
 
         Map<String, List<PodcastDTO>> res = new LinkedHashMap<>();
+
         for(Topic topic : topics) {
-            List<Podcast> list = podcastRepository.findTop3ByTopicNameOrderByCreatedAtDesc(topic.getName());
-            res.put(topic.getName(), list.stream().map(PodcastMapper::toDTO).limit(3).toList());
+            String topicName = topic.getName();
+
+            // fetch top 3 from MongoDB
+            List<Podcast> list = podcastRepository.findTop3ByTopicNameOrderByCreatedAtDesc(topicName);
+
+            // if podcast aren't in db
+            if (list.isEmpty()) {
+                // then fetched from yt
+                List<PodcastDTO> fetched = youTubeService.fetchAndSavePodcasts(topicName);
+
+                res.put(topicName, fetched);
+            } else {
+                // if it is in DB then send that
+                List<PodcastDTO> dtos = list.stream().map(PodcastMapper::toDTO).toList();
+                res.put(topicName, dtos);
+            }
         }
         return res;
     }

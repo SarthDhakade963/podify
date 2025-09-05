@@ -6,5 +6,4 @@ import com.example.podify.dto.UserDTO;
 public interface PlaylistService {
     PlaylistDTO add(String podcastId);
 
-
 }
