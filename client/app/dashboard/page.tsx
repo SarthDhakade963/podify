@@ -4,6 +4,8 @@ import { Podcast } from "@/types/type";
 import { fetchWithToken } from "@/lib/fetchWithToken";
 import PodcastCard from "@/component/PodcastCard";
 import ReactPlayer from "react-player";
+import VideoPlayer from "@/component/VideoPlayer";
+import { url } from "inspector";
 
 interface PlayerProps {
   url: string;
@@ -12,6 +14,12 @@ interface PlayerProps {
 export default function Dashboard() {
   const [podcasts, setPodcasts] = useState<Record<string, Podcast[]>>({});
   const [currentPodcast, setCurrentPodcast] = useState<Podcast | null>(null);
+
+  useEffect(() => {
+    if (currentPodcast?.videoUrl) {
+      console.log("Now trying to play:", currentPodcast.videoUrl);
+    }
+  }, [currentPodcast]);
 
   useEffect(() => {
     const fetchingPodcast = async () => {
@@ -41,26 +49,16 @@ export default function Dashboard() {
     fetchingPodcast();
   }, []);
 
+  console.log("Currently playing podcast : ", currentPodcast);
+
   return (
     <div className="p-6">
       {/* Player at the top */}
-      {currentPodcast && (
-        <div className="mb-8 bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-4">
-          <h2 className="text-lg font-semibold mb-2">
-            Now Playing: {currentPodcast.title}
-          </h2>
-          {currentPodcast.videoUrl ? (
-            <ReactPlayer
-              url={currentPodcast.videoUrl}
-              controls
-              width="100%"
-              height="200px"
-            />
-          ) : (
-            <div className="text-center text-gray-500 py-6">
-              Select a podcast to start playing 🎧
-            </div>
-          )}
+      {currentPodcast?.videoUrl ? (
+        <VideoPlayer videoId={currentPodcast.id} />
+      ) : (
+        <div className="text-center text-gray-500 py-6">
+          Select a podcast to start playing 🎧
         </div>
       )}
 
