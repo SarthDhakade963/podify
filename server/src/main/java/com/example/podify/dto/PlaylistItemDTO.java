@@ -1,21 +1,19 @@
 package com.example.podify.dto;
 
-import com.example.podify.model.User;
+import com.example.podify.model.Playlist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class PlaylistDTO {
+public class PlaylistItemDTO {
     private UUID id;
-    private String name;
-    private UserDTO user;
-    private List<String> podcastIds;
+    private String podcastId;
+    private PlaylistDTO playlistDTO;
 }

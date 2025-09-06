@@ -25,5 +25,4 @@ public class Topic extends Auditable {
     @JoinColumn(name = "user_id", nullable = false)
     @ToString.Exclude
     private User user;
-
 }

@@ -1,25 +1,23 @@
 "use client";
 
 import YouTube, { YouTubeProps } from "react-youtube";
-
 interface VideoPlayerProps {
-  videoId: string; // YouTube video ID, e.g., "qHl3st9tlSE"
+  videoId: string;
 }
 
+// Video Player Component
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoId }) => {
-  // Player options
-  const opts: YouTubeProps["opts"] = {
-    height: "500",
+  const opts = {
+    height: "400",
     width: "100%",
     playerVars: {
-      autoplay: 1, // 0 = don't autoplay, 1 = autoplay
-      controls: 1, // show controls
-      modestbranding: 1, // hides YouTube logo
-      rel: 0, // prevents showing related videos
+      autoplay: 1,
+      controls: 1,
+      modestbranding: 1,
+      rel: 0,
     },
   };
 
-  // Example: event handler when video is ready
   const onReady: YouTubeProps["onReady"] = (event) => {
     console.log("YouTube player ready:", event.target);
   };
@@ -28,11 +26,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoId }) => {
     console.error("YouTube player error:", event.data);
   };
 
-  console.log("Now trying to play via react-youtube:", videoId);
-
   return (
-    <div className="rounded-2xl overflow-hidden shadow-md w-full h-[500px] mb-4">
-      <YouTube videoId={videoId} opts={opts} onReady={onReady} onError={onError} />
+    <div className="rounded-2xl overflow-hidden shadow-2xl w-full mb-6 bg-gray-900/50 backdrop-blur-sm border border-gray-800">
+      <YouTube
+        videoId={videoId}
+        opts={opts}
+        onReady={onReady}
+        onError={onError}
+      />
     </div>
   );
 };
