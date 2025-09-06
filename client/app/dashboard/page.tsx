@@ -11,34 +11,24 @@ const VideoPlayer = dynamic(() => import("@/component/VideoPlayer"), {
 const Sidebar = dynamic(() => import("@/component/Sidebar"), {
   ssr: false,
 });
-import { Button } from "@/components/ui/button";
+import LoadingPage from "@/component/LoadingPage";
 import { fetchWithToken } from "@/lib/fetchWithToken";
 import { Podcast } from "@/types/type";
-import {
-  HistoryIcon,
-  Home,
-  List,
-  LucideIcon,
-  Menu,
-  Settings,
-} from "lucide-react";
+import { Menu } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
-interface SidebarItems {
-  id: string;
-  label: string;
-  icon: LucideIcon;
-}
 export default function Dashboard() {
   const [podcasts, setPodcasts] = useState<Record<string, Podcast[]>>({});
   const [currentPodcast, setCurrentPodcast] = useState<Podcast | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchingPodcast = async () => {
+      setIsLoading(true);
       try {
         const res = await fetchWithToken("/podcasts", {
           method: "GET",
@@ -59,18 +49,30 @@ export default function Dashboard() {
         setPodcasts(data);
       } catch (error) {
         console.error("Error fetching podcasts:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchingPodcast();
   }, []);
 
-  const sidebarItems: SidebarItems[] = [
-    { id: "home", label: "Home", icon: Home },
-    { id: "playlist", label: "Playlist", icon: List },
-    { id: "history", label: "Watch History", icon: HistoryIcon },
-    { id: "settings", label: "Settings", icon: Settings },
-  ];
+  // Handle window resize to manage sidebar states
+  useEffect(() => {
+    const handleResize = () => {
+      // Close mobile sidebar when resizing to desktop
+      if (window.innerWidth >= 1024) {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  if(isLoading) {
+    return <LoadingPage title={"Loading your Dashboard..."}/>
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-slate-800 text-white">
@@ -85,31 +87,35 @@ export default function Dashboard() {
         setActiveTab={setActiveTab}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
-        sidebarCollapsed={false}
+        sidebarCollapsed={sidebarCollapsed}
         setSidebarCollapsed={setSidebarCollapsed}
       />
 
       {/* Main Content */}
       <div
-        className={`relative z-10 transition-all duration-300 ${
+        className={`relative z-10 transition-all duration-300 ease-in-out ${
           sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
         }`}
       >
         {/* Top Bar */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-800/50">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-gray-400 hover:text-white"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-800/50">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden text-gray-400 hover:text-white"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
 
-          <h2 className="text-2xl font-bold">
-            {activeTab === "home" && "Discover Podcasts"}
-            {activeTab === "playlist" && "My Playlists"}
-            {activeTab === "history" && "Watch History"}
-            {activeTab === "settings" && "Settings"}
-          </h2>
+            {/* Desktop Sidebar Toggle Button */}
+
+            <h2 className="text-2xl font-bold">
+              {activeTab === "home" && "Discover Podcasts"}
+              {activeTab === "playlist" && "My Playlists"}
+              {activeTab === "history" && "Watch History"}
+              {activeTab === "settings" && "Settings"}
+            </h2>
+          </div>
 
           <div className="text-sm text-gray-400">
             {Object.values(podcasts).flat().length} podcasts available
@@ -117,13 +123,13 @@ export default function Dashboard() {
         </div>
 
         {/* Content Area */}
-        <div className="p-6">
+        <div className="p-6 sm:p-8">
           {activeTab === "home" && (
             <>
               {/* Player Section */}
               {currentPodcast?.videoUrl ? (
                 <div className="mb-8">
-                  <h3 className="text-xl font-semibold mb-4 text-orange-400">
+                  <h3 className="text-xl sm:2xl font-semibold mb-4 text-orange-400">
                     Now Playing
                   </h3>
                   <VideoPlayer videoId={currentPodcast.id} />
@@ -168,41 +174,6 @@ export default function Dashboard() {
                 </div>
               ))}
             </>
-          )}
-
-          {activeTab === "playlist" && (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">📝</div>
-              <h3 className="text-2xl font-bold text-white mb-4">
-                Your Playlists
-              </h3>
-              <p className="text-gray-400">
-                Create and manage your podcast collections
-              </p>
-              <Button className="mt-6 bg-gradient-to-r from-orange-500 to-orange-600 text-black font-semibold hover:from-orange-400 hover:to-orange-500">
-                Create New Playlist
-              </Button>
-            </div>
-          )}
-
-          {activeTab === "history" && (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">📚</div>
-              <h3 className="text-2xl font-bold text-white mb-4">
-                Watch History
-              </h3>
-              <p className="text-gray-400">
-                Keep track of all the podcasts you&apos;ve enjoyed
-              </p>
-            </div>
-          )}
-
-          {activeTab === "settings" && (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">⚙️</div>
-              <h3 className="text-2xl font-bold text-white mb-4">Settings</h3>
-              <p className="text-gray-400">Customize your Podify experience</p>
-            </div>
           )}
         </div>
       </div>

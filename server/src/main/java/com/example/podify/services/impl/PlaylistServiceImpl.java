@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -40,8 +41,9 @@ public class PlaylistServiceImpl extends Signable implements PlaylistService {
         }
 
         Playlist playlist = Playlist.builder()
-                            .name(name)
+                            .name(name.replaceAll("\"","").trim())
                             .user(user)
+                            .items(new ArrayList<>())
                             .build();
 
         playlistRepository.save(playlist);
@@ -86,7 +88,7 @@ public class PlaylistServiceImpl extends Signable implements PlaylistService {
     public void removePodcast(String podcastId, String name) {
         User user = getLoggedInUser();
         Playlist playlist = playlistRepository.findByUserAndName(user, name).orElseThrow(() -> new RuntimeException("No Playlist found"));
-        playlistItemRepository.deleteByPodcastIdAndPlaylistId(podcastId, playlist.getId());
+        playlistItemRepository.deleteByPodcastIdAndPlaylist_Id(podcastId, playlist.getId());
     }
 
     @Override

@@ -1,38 +1,34 @@
 "use client";
-
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import {
-  LucideIcon,
+  X,
   Home,
   List,
   History as HistoryIcon,
-  Settings,
   Search,
-  X,
   ChevronLeft,
   ChevronRight,
+  LucideIcon,
 } from "lucide-react";
-import { useEffect } from "react";
+import { SidebarProps } from "@/types/type";
 
 export type SidebarItem = {
   id: string;
   label: string;
   icon: LucideIcon;
+  dest: string;
 };
 
-interface SidebarProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  sidebarOpen: boolean;
-  setSidebarOpen: (open: boolean) => void;
-  sidebarCollapsed: boolean;
-  setSidebarCollapsed: (collapsed: boolean) => void;
-}
-
-const sidebarItems: SidebarItem[] = [
-  { id: "home", label: "Home", icon: Home },
-  { id: "playlist", label: "Playlist", icon: List },
-  { id: "history", label: "Watch History", icon: HistoryIcon },
-  { id: "settings", label: "Settings", icon: Settings },
+export const sidebarItems: SidebarItem[] = [
+  { id: "home", label: "Home", icon: Home, dest: "/dashboard" },
+  { id: "playlist", label: "Playlist", icon: List, dest: "/playlist" },
+  {
+    id: "history",
+    label: "Watch History",
+    icon: HistoryIcon,
+    dest: "/history",
+  },
 ];
 
 const Sidebar = ({
@@ -43,6 +39,7 @@ const Sidebar = ({
   sidebarCollapsed,
   setSidebarCollapsed,
 }: SidebarProps) => {
+  const router = useRouter();
   // Close sidebar on escape key
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -98,7 +95,7 @@ const Sidebar = ({
                 ${sidebarCollapsed ? "lg:p-2" : "p-4 sm:p-6"}`}
           >
             {/* Logo and Close Button */}
-            <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <div className="flex items-center justify-between mb-4 sm:mb-8">
               <h1
                 className={`font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent transition-all duration-300 ${
                   sidebarCollapsed
@@ -169,8 +166,9 @@ const Sidebar = ({
                     onClick={() => {
                       setActiveTab(item.id);
                       setSidebarOpen(false);
+                      router.push(item.dest);
                     }}
-                    className={`w-full flex items-center rounded-xl transition-all duration-200 text-left relative group ${
+                    className={`w-full flex items-center rounded-xl transition-all duration-200 text-left relative group mb-4 ${
                       sidebarCollapsed
                         ? "lg:justify-center lg:p-3"
                         : "gap-3 px-4 py-3"

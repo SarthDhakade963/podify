@@ -18,7 +18,8 @@ public class PlaylistController {
 
     // Create a new playlist
     @PostMapping
-    public ResponseEntity<PlaylistDTO> createPlaylist(@RequestParam String name) {
+    public ResponseEntity<PlaylistDTO> createPlaylist(@RequestBody String name) {
+        System.out.println(name);
         PlaylistDTO playlist = playlistService.createPlaylist(name);
         return ResponseEntity.status(201).body(playlist);
     }

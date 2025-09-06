@@ -17,3 +17,24 @@ export interface Podcast {
   videoUrl: string;
   transcript?: string;
 }
+
+export interface Playlist {
+  id: string;
+  name: string;
+  podcastIds: string[];
+}
+
+// Sidebar Types
+
+
+
+export interface SidebarProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+  sidebarCollapsed: boolean;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+}
+
+
