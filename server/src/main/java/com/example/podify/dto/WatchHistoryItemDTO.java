@@ -1,21 +1,22 @@
 package com.example.podify.dto;
 
-import com.example.podify.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
+
 
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Builder
-public class WatchHistoryDTO {
+public class WatchHistoryItemDTO {
     private UUID id;
-    private UserDTO user;
-    private String topicName;
-    private List<WatchHistoryItemDTO> watchHistoryItemDTOS;
+    private String podcastId;
+    private WatchHistoryDTO watchHistoryDTO;
+    private long watchedAt;
+    private boolean completed;
+    private float progress;
 }

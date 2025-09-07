@@ -6,21 +6,21 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class WatchHistoryMapper {
-    public WatchHistory toEntity(WatchHistoryDTO watchHistoryDTO) {
+    public static WatchHistory toEntity(WatchHistoryDTO watchHistoryDTO) {
         return WatchHistory.builder()
                 .id(watchHistoryDTO.getId())
-                .podcastId(watchHistoryDTO.getPodcastId())
-                .watchedAt(watchHistoryDTO.getWatchedAt())
                 .user(UserMapper.toEntity(watchHistoryDTO.getUser()))
+                .topicName(watchHistoryDTO.getTopicName())
+                .watchHistoryItems(watchHistoryDTO.getWatchHistoryItemDTOS().stream().map(WatchHistoryItemMapper::toEntity).toList())
                 .build();
     }
 
-    public WatchHistoryDTO toDTO(WatchHistory watchHistory) {
+    public static WatchHistoryDTO toDTO(WatchHistory watchHistory) {
         return WatchHistoryDTO.builder()
                 .id(watchHistory.getId())
-                .podcastId(watchHistory.getPodcastId())
-                .watchedAt(watchHistory.getWatchedAt())
                 .user(UserMapper.toDTO(watchHistory.getUser()))
+                .topicName(watchHistory.getTopicName())
+                .watchHistoryItemDTOS(watchHistory.getWatchHistoryItems().stream().map(WatchHistoryItemMapper::toDTO).toList())
                 .build();
     }
 }

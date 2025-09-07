@@ -21,7 +21,6 @@ import java.util.Objects;
 public class YouTubeServiceImpl implements YouTubeService {
     private final PodcastRepository podcastRepository;
     private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper;
 
     @Value("${youtube.api.key}")
     private String apiKey;

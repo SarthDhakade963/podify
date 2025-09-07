@@ -1,8 +1,6 @@
 package com.example.podify.dto;
 
-import com.example.podify.dto.AuthDTO.AuthResponseDTO;
 import lombok.*;
-import org.springframework.http.ResponseEntity;
 
 import java.util.UUID;
 

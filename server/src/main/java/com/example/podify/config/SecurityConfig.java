@@ -57,7 +57,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/**", "/api/topic/**", "/api/playlists/**", "/api/podcasts/**").authenticated()
+                                .requestMatchers("/api/**", "/api/topic/**", "/api/playlists/**", "/api/podcasts/**, /api/history/**").authenticated()
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(oAuth ->
