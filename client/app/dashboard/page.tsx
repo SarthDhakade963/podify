@@ -12,9 +12,11 @@ const Sidebar = dynamic(() => import("@/component/Sidebar"), {
   ssr: false,
 });
 import LoadingPage from "@/component/LoadingPage";
+import { Button } from "@/components/ui/button";
 import { fetchWithToken } from "@/lib/fetchWithToken";
-import { Podcast } from "@/types/type";
-import { Menu } from "lucide-react";
+import { Playlist, Podcast } from "@/types/type";
+import { Dialog } from "@headlessui/react";
+import { Menu, Play } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
@@ -25,6 +27,11 @@ export default function Dashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const [isLoading, setIsLoading] = useState(false);
+  const [playlists, setPlaylists] = useState<Playlist[]>();
+  const [selectedPodcastId, setSelectedPodcastId] = useState<string | null>(
+    null
+  );
+  const [isAddPodcastModalOpen, setIsAddPodcastModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchingPodcast = async () => {
@@ -57,6 +64,59 @@ export default function Dashboard() {
     fetchingPodcast();
   }, []);
 
+  useEffect(() => {
+    fetchPlaylists();
+  }, []);
+
+  const fetchPlaylists = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetchWithToken("/playlists", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        console.error("Failed to fetch playlists", res.status);
+        return;
+      }
+
+      const data: Playlist[] = await res.json();
+      setPlaylists(data);
+    } catch (error) {
+      console.error("Error fetching playlists:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddPodcastToPlaylist = async (playlistName: string) => {
+    if (!selectedPodcastId) return;
+
+    try {
+      const res = await fetchWithToken(`/playlists/${playlistName}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(selectedPodcastId.replaceAll(/"/g, "").trim()),
+      });
+
+      if (!res.ok) {
+        console.error("Failed to add podcast", res.status);
+        return;
+      }
+      const data = await res.text();
+
+      setIsAddPodcastModalOpen(false);
+      setSelectedPodcastId(null);
+    } catch (error) {
+      console.error("Error adding podcast to playlist:", error);
+    }
+  };
+
   // Handle window resize to manage sidebar states
   useEffect(() => {
     const handleResize = () => {
@@ -70,8 +130,8 @@ export default function Dashboard() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  if(isLoading) {
-    return <LoadingPage title={"Loading your Dashboard..."}/>
+  if (isLoading) {
+    return <LoadingPage title={"Loading your Dashboard..."} />;
   }
 
   return (
@@ -165,14 +225,55 @@ export default function Dashboard() {
                         key={podcast.id}
                         podcast={podcast}
                         onPlayClick={(p) => setCurrentPodcast(p)}
-                        onAddToPlaylist={(p) =>
-                          console.log("Add to playlist:", p)
-                        }
+                        onAddToPlaylist={(p) => {
+                          setSelectedPodcastId(p.id);
+                          setIsAddPodcastModalOpen(true);
+                        }}
+                        enablePlaylistBtn={true}
                       />
                     ))}
                   </div>
                 </div>
               ))}
+
+              <Dialog
+                open={isAddPodcastModalOpen}
+                onClose={() => setIsAddPodcastModalOpen(false)}
+                className="relative z-50"
+              >
+                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+                  <Dialog.Panel className="bg-gray-900 border border-gray-800 p-8 rounded-2xl shadow-2xl max-w-md w-full">
+                    <Dialog.Title className="text-2xl font-bold text-white mb-4">
+                      Add Podcast to Playlist
+                    </Dialog.Title>
+
+                    <div className="space-y-3 max-h-64 overflow-y-auto">
+                      {playlists &&
+                        playlists.map((playlist) => (
+                          <div
+                            key={playlist.id}
+                            className="flex items-center justify-between p-3 bg-gray-800 rounded-lg hover:bg-orange-500/20 cursor-pointer"
+                            onClick={() =>
+                              handleAddPodcastToPlaylist(playlist.name)
+                            }
+                          >
+                            <span className="text-white">{playlist.name}</span>
+                            <Play className="w-5 h-5 text-orange-400" />
+                          </div>
+                        ))}
+                    </div>
+
+                    <div className="mt-6 flex justify-end">
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsAddPodcastModalOpen(false)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </Dialog.Panel>
+                </div>
+              </Dialog>
             </>
           )}
         </div>

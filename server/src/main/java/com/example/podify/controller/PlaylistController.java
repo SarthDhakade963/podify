@@ -2,6 +2,7 @@ package com.example.podify.controller;
 
 import com.example.podify.dto.PlaylistDTO;
 import com.example.podify.dto.PlaylistItemDTO;
+import com.example.podify.dto.PodcastDTO;
 import com.example.podify.services.PlaylistService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,25 +40,29 @@ public class PlaylistController {
     }
 
     // Add a podcast to a playlist
-    @PostMapping("/{name}/podcasts")
+    @PostMapping("/{name}")
     public ResponseEntity<Void> addPodcast(@PathVariable String name,
-                                           @RequestParam String podcastId) {
-        playlistService.addPodcast(podcastId, name);
+                                           @RequestBody String podcastId) {
+        playlistService.addPodcast(podcastId.replaceAll("\"","").trim(), name);
         return ResponseEntity.ok().build();
     }
 
     // Get all podcasts in a playlist
-    @GetMapping("/{name}/podcasts")
-    public ResponseEntity<List<PlaylistItemDTO>> getAllPodcasts(@PathVariable String name) {
-        List<PlaylistItemDTO> podcasts = playlistService.getAllPodcast(name);
-        return ResponseEntity.ok(podcasts);
+    @GetMapping("/{name}")
+    public ResponseEntity<List<PodcastDTO>> getAllPodcasts(@PathVariable String name) {
+        try {
+            List<PodcastDTO> podcasts = playlistService.getAllPodcast(name);
+            return ResponseEntity.ok(podcasts);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // Remove a podcast from a playlist
-    @DeleteMapping("/{name}/podcasts/{podcastId}")
+    @DeleteMapping("/{name}/podcast")
     public ResponseEntity<Void> removePodcast(@PathVariable String name,
-                                              @PathVariable String podcastId) {
-        playlistService.removePodcast(podcastId, name);
+                                              @RequestBody String podcastId) {
+        playlistService.removePodcast(podcastId.replaceAll("\"","").trim(), name);
         return ResponseEntity.noContent().build();
     }
 }

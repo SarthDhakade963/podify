@@ -2,19 +2,19 @@ package com.example.podify.services.impl;
 
 import com.example.podify.dto.PlaylistDTO;
 import com.example.podify.dto.PlaylistItemDTO;
-import com.example.podify.dto.UserDTO;
+import com.example.podify.dto.PodcastDTO;
 import com.example.podify.mapper.PlaylistItemMapper;
 import com.example.podify.mapper.PlaylistMapper;
-import com.example.podify.mapper.UserMapper;
+import com.example.podify.mapper.PodcastMapper;
 import com.example.podify.model.Playlist;
 import com.example.podify.model.PlaylistItem;
 import com.example.podify.model.User;
 import com.example.podify.repository.jpa.PlaylistItemRepository;
 import com.example.podify.repository.jpa.PlaylistRepository;
 import com.example.podify.repository.jpa.UserRepository;
+import com.example.podify.repository.mongo.PodcastRepository;
 import com.example.podify.services.PlaylistService;
 import com.example.podify.services.Signable;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-
 public class PlaylistServiceImpl extends Signable implements PlaylistService {
     private final PlaylistRepository playlistRepository;
+    private final PodcastRepository podcastRepository;
     private final PlaylistItemRepository playlistItemRepository;
-    public PlaylistServiceImpl(UserRepository userRepository, PlaylistRepository playlistRepository, PlaylistItemRepository playlistItemRepository) {
+    public PlaylistServiceImpl(UserRepository userRepository, PlaylistRepository playlistRepository, PodcastRepository podcastRepository, PlaylistItemRepository playlistItemRepository) {
         super(userRepository);
         this.playlistRepository = playlistRepository;
+        this.podcastRepository = podcastRepository;
         this.playlistItemRepository = playlistItemRepository;
     }
 
@@ -91,10 +92,23 @@ public class PlaylistServiceImpl extends Signable implements PlaylistService {
         playlistItemRepository.deleteByPodcastIdAndPlaylist_Id(podcastId, playlist.getId());
     }
 
+    PlaylistItem playlistItem;
     @Override
-    public List<PlaylistItemDTO> getAllPodcast(String playlistName) {
+    public List<PodcastDTO> getAllPodcast(String playlistName) {
         User  user = getLoggedInUser();
         Playlist playlist = playlistRepository.findByUserAndName(user, playlistName).orElseThrow(() -> new RuntimeException("No playlist found"));
-        return playlist.getItems().stream().map(PlaylistItemMapper::toDTO).toList();
+
+        List<PodcastDTO> podcastDTOList = new ArrayList<>();
+
+        for (PlaylistItem playlistItem : playlist.getItems()) {
+            if (podcastRepository.existsById(playlistItem.getPodcastId())) {
+                PodcastDTO podcastDTO = podcastRepository.findById(playlistItem.getPodcastId())
+                        .map(PodcastMapper::toDTO)
+                        .orElseThrow(() -> new RuntimeException("Podcast for a given Playlist not found"));
+                podcastDTOList.add(podcastDTO);
+            }
+        }
+
+        return podcastDTOList.stream().toList();
     }
 }

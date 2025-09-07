@@ -6,9 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@headlessui/react";
 import { Plus, Music, X, Folder, Play, Menu } from "lucide-react";
 import { Playlist } from "@/types/type";
-const Sidebar = dynamic(() => import("@/component/Sidebar"), {
-  ssr: false,
-});
+
 
 const LoadingPage = dynamic(() => import("@/component/LoadingPage"), {
   ssr: false,
@@ -18,9 +16,7 @@ import dynamic from "next/dynamic";
 export default function PlaylistsPage() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("playlist");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState<string>("");
   const router = useRouter();
@@ -84,23 +80,12 @@ export default function PlaylistsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-slate-800 text-white">
-      {/* Sidebar */}
-      <Sidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        sidebarCollapsed={sidebarCollapsed}
-        setSidebarCollapsed={setSidebarCollapsed}
-      />
-
+    <div
+      className={`min-h-screen bg-gradient-to-br from-black via-gray-900 to-slate-800 text-white transition-all duration-300 ease-in-out`}
+    >
       {/* Main Content with dynamic margin */}
       <div
-        className={`transition-all duration-300 ease-in-out ${
-          // Responsive margin based on sidebar state
-          sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
-        } ${
+        className={`transition-all duration-300 ease-in-out  ${
           // No margin on mobile when sidebar is closed
           sidebarOpen ? "ml-0" : "ml-0"
         }`}
@@ -308,7 +293,7 @@ export default function PlaylistsPage() {
                     onChange={(e) => setNewPlaylistName(e.target.value)}
                     className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all duration-300"
                     autoFocus
-                    onKeyPress={(e) =>
+                    onKeyDown={(e) =>
                       e.key === "Enter" && handleCreatePlaylist()
                     }
                   />

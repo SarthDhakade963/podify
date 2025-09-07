@@ -9,10 +9,16 @@ interface Props {
   podcast: Podcast;
   onPlayClick: (podcast: Podcast) => void;
   onAddToPlaylist: (podcast: Podcast) => void;
+  enablePlaylistBtn: boolean;
 }
 
 // Podcast Card Component
-const PodcastCard = ({ podcast, onPlayClick, onAddToPlaylist } : Props) => {
+const PodcastCard = ({
+  podcast,
+  onPlayClick,
+  onAddToPlaylist,
+  enablePlaylistBtn,
+}: Props) => {
   return (
     <div className="bg-gray-900/40 backdrop-blur-sm border border-gray-800 shadow-xl rounded-2xl p-4 flex flex-col hover:border-orange-500/50 transition-all duration-300 group hover:transform hover:scale-105">
       <div className="relative overflow-hidden rounded-xl mb-3">
@@ -44,14 +50,16 @@ const PodcastCard = ({ podcast, onPlayClick, onAddToPlaylist } : Props) => {
         >
           <Play className="w-4 h-4 mr-1" /> Play
         </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => onAddToPlaylist(podcast)}
-          className="border-gray-600 text-gray-300 hover:border-orange-500 hover:text-orange-400 hover:bg-orange-500/10 transition-all duration-300"
-        >
-          + Playlist
-        </Button>
+        {enablePlaylistBtn && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onAddToPlaylist(podcast)}
+            className="border-gray-600 text-gray-300 hover:border-orange-500 hover:text-orange-400 hover:bg-orange-500/10 transition-all duration-300"
+          >
+            + Playlist
+          </Button>
+        )}
       </div>
     </div>
   );
