@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Document(collection = "podcasts")
@@ -41,4 +42,6 @@ public class Podcast extends Auditable {
     private String videoUrl;
 
     private String transcript;
+
+    private Instant lastFetchedAt;
 }

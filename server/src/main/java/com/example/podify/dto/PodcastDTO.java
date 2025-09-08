@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.time.Instant;
+
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -17,4 +19,5 @@ public class PodcastDTO {
     private String topicName; // name of the topic
     private String description;
     private String videoUrl;
+    private Instant lastFetchedAt;
 }
