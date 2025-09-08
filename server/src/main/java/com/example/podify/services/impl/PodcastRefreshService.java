@@ -25,15 +25,12 @@ public class PodcastRefreshService extends Signable {
     // Every day new podcasts are fetched
     @Scheduled(fixedRate = 1000 * 60 * 60 * 24)
     public void refreshPodcasts() {
-        User user = getLoggedInUser();
+        List<User> users = userRepository.findAllWithTopics(); // fetch all users
 
-        List<Topic> topics = user.getTopics();
-        for (Topic topic : topics) {
-            String topicName = topic.getName();
-            try {
-                youTubeService.fetchAndSavePodcasts(topicName);
-            } catch (Exception e) {
-                System.err.println("Error fetching podcasts for topic " + topicName + ": " + e.getMessage());
+        for (User user : users) {
+            List<Topic> topics = user.getTopics();
+            for (Topic topic : topics) {
+                youTubeService.fetchAndSavePodcasts(topic.getName());
             }
         }
     }

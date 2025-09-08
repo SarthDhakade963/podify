@@ -310,7 +310,7 @@ export default function Dashboard() {
                     <div className="h-1 w-16 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"></div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {podcasts[topic].map((podcast) => (
+                    {podcasts[topic].slice(0,3).map((podcast) => (
                       <PodcastCard
                         key={podcast.id}
                         podcast={podcast}

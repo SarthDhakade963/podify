@@ -65,6 +65,8 @@ public class PodcastServiceImpl extends Signable implements PodcastService {
     private boolean isStale(List<Podcast> podcasts) {
         if (podcasts.isEmpty()) return true;
         Instant latest = podcasts.getFirst().getLastFetchedAt();
+        // if lastFetchedAt is null, consider it stale
+        if (latest == null) return true;
         return latest.isBefore(Instant.now().minus(24, ChronoUnit.HOURS));
     }
 

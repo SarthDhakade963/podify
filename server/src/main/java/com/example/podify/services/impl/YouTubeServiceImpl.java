@@ -88,7 +88,6 @@ public class YouTubeServiceImpl implements YouTubeService {
 
         Instant now = Instant.now();
 
-
         for (PodcastDTO dto : podcastDTOS) {
             podcastRepository.findById(dto.getId()).ifPresentOrElse(existingPodcast -> {
                 // Update existing podcast's lastFetchedAt
