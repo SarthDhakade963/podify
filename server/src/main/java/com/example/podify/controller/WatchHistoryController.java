@@ -1,8 +1,9 @@
-package com.example.podify.controllers;
+package com.example.podify.controller;
 
 import com.example.podify.dto.PodcastDTO;
 import com.example.podify.dto.WatchHistoryItemDTO;
 import com.example.podify.services.WatchHistoryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,20 +11,23 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/watch-history")
+@RequiredArgsConstructor
 public class WatchHistoryController {
 
     private final WatchHistoryService watchHistoryService;
 
-    public WatchHistoryController(WatchHistoryService watchHistoryService) {
-        this.watchHistoryService = watchHistoryService;
-    }
-    
     @PostMapping("/{topicName}")
     public ResponseEntity<String> saveOrUpdateWatchHistory(
             @PathVariable("topicName") String topicName,
             @RequestBody WatchHistoryItemDTO watchHistoryItemDTO) {
         watchHistoryService.saveOrUpdateWatchHistory(watchHistoryItemDTO, topicName);
         return ResponseEntity.ok("Watch history saved/updated successfully.");
+    }
+
+    @GetMapping("/{topicName}")
+    public ResponseEntity<List<PodcastDTO>> getAllWatchHistoryByTopic(@PathVariable("topicName") String topicName) {
+        List<PodcastDTO> podcastDTOList = watchHistoryService.getAllHistoryByTopic(topicName);
+        return ResponseEntity.ok(podcastDTOList);
     }
 
     @GetMapping("/{topicName}/incomplete")

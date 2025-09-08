@@ -5,11 +5,12 @@ import com.example.podify.dto.WatchHistoryDTO;
 import com.example.podify.model.WatchHistory;
 import com.example.podify.model.WatchHistoryItem;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public interface WatchHistoryItemRepository extends JpaRepository<WatchHistoryItem, UUID> {
     // Fetch all items belonging to a specific watch history
     List<WatchHistoryItem> findByWatchHistoryId(UUID watchHistoryId);

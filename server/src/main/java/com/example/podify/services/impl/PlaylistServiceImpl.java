@@ -1,9 +1,7 @@
 package com.example.podify.services.impl;
 
 import com.example.podify.dto.PlaylistDTO;
-import com.example.podify.dto.PlaylistItemDTO;
 import com.example.podify.dto.PodcastDTO;
-import com.example.podify.mapper.PlaylistItemMapper;
 import com.example.podify.mapper.PlaylistMapper;
 import com.example.podify.mapper.PodcastMapper;
 import com.example.podify.model.Playlist;

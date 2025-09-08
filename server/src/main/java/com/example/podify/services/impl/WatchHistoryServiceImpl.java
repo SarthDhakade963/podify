@@ -66,7 +66,7 @@ public class WatchHistoryServiceImpl extends Signable implements WatchHistorySer
                 .findFirst()
                 .orElse(null);
 
-        if (watchHistoryItem != null) {
+        if (watchHistoryItem != null && !watchHistoryItem.isCompleted()) {
             // Update existing item
             watchHistoryItem.setProgress(watchHistoryItemDTO.getProgress());
             watchHistoryItem.setWatchedAt(watchHistoryItemDTO.getWatchedAt());
@@ -74,7 +74,7 @@ public class WatchHistoryServiceImpl extends Signable implements WatchHistorySer
         } else {
             // Create new item
             watchHistoryItem = WatchHistoryItem.builder()
-                    .podcastId(watchHistoryItemDTO.getPodcastId())
+                    .podcastId(watchHistoryItemDTO.getPodcastId().replaceAll("\"","").trim())
                     .watchedAt(watchHistoryItemDTO.getWatchedAt())
                     .progress(watchHistoryItemDTO.getProgress())
                     .completed(watchHistoryItemDTO.getProgress() >= 95)
@@ -84,6 +84,26 @@ public class WatchHistoryServiceImpl extends Signable implements WatchHistorySer
         }
 
         watchHistoryRepository.save(watchHistory);
+    }
+
+    @Override
+    public List<PodcastDTO> getAllHistoryByTopic(String topicName) {
+        User user = getLoggedInUser();
+
+        WatchHistory watchHistory = watchHistoryRepository.findByUserAndTopicName(user, topicName).orElseGet(() ->
+                createNewWatchHistoryEntity(topicName)
+        );
+
+        List<WatchHistoryItem> watchHistoryItems = watchHistoryItemRepository.findByWatchHistoryId(watchHistory.getId());
+
+        List<String> podcastIds = watchHistoryItems.stream()
+                .map(WatchHistoryItem::getPodcastId)
+                .toList();
+
+        List<Podcast> getAllPodcasts = podcastRepository.findAllById(podcastIds);
+
+        return getAllPodcasts.stream().map(PodcastMapper::toDTO).toList();
+
     }
 
     @Override

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "watch_history_item", uniqueConstraints = @UniqueConstraint(columnNames = {"watch_history_id", "podcast_id"}))
+@Table(name = "watch_history_item")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

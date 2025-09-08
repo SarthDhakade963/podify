@@ -32,6 +32,7 @@ export default function Dashboard() {
     null
   );
   const [isAddPodcastModalOpen, setIsAddPodcastModalOpen] = useState(false);
+  const [topicName, setTopicName] = useState("");
 
   useEffect(() => {
     const fetchingPodcast = async () => {
@@ -133,6 +134,53 @@ export default function Dashboard() {
   if (isLoading) {
     return <LoadingPage title={"Loading your Dashboard..."} />;
   }
+  const handleAddPodcastToHistory = async (
+    podcast: Podcast,
+    topicName: string,
+    progress: number
+  ) => {
+    try {
+      const watchHistoryItem = {
+        podcastId: podcast.id,
+        watchedAt: Date.now(),
+        completed: progress >= 95,
+        progress: progress,
+        watchHistoryDTO: null, // you can remove this if it's not required or adjust based on your API expectations
+      };
+
+      console.log("Topic Name", topicName);
+
+      const res = await fetchWithToken(`/watch-history/${topicName}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(watchHistoryItem),
+      });
+
+      if (!res.ok) {
+        console.error("Failed to add podcast to history", res.status);
+        return;
+      }
+
+      console.log("Podcast history updated successfully");
+    } catch (error) {
+      console.error("Error adding podcast to history:", error);
+    }
+  };
+
+  const onPodcastPlay = (podcast: Podcast, topicName: string) => {
+    setCurrentPodcast(podcast);
+    handleAddPodcastToHistory(podcast, topicName, 0); // starting with 0% progress
+  };
+
+  const onProgressUpdate = (
+    podcast: Podcast,
+    topicName: string,
+    progress: number
+  ) => {
+    handleAddPodcastToHistory(podcast, topicName, progress);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-slate-800 text-white">
@@ -192,7 +240,13 @@ export default function Dashboard() {
                   <h3 className="text-xl sm:2xl font-semibold mb-4 text-orange-400">
                     Now Playing
                   </h3>
-                  <VideoPlayer videoId={currentPodcast.id} />
+                  <VideoPlayer
+                    videoId={currentPodcast.id}
+                    onPlay={() => onPodcastPlay(currentPodcast, topicName)}
+                    onProgressUpdate={(progress) =>
+                      onProgressUpdate(currentPodcast, topicName, progress)
+                    }
+                  />
                   <div className="text-center">
                     <h4 className="text-lg font-semibold text-white mb-1">
                       {currentPodcast.title}
@@ -224,7 +278,10 @@ export default function Dashboard() {
                       <PodcastCard
                         key={podcast.id}
                         podcast={podcast}
-                        onPlayClick={(p) => setCurrentPodcast(p)}
+                        onPlayClick={(p) => {
+                          setCurrentPodcast(p);
+                          setTopicName(topic);
+                        }}
                         onAddToPlaylist={(p) => {
                           setSelectedPodcastId(p.id);
                           setIsAddPodcastModalOpen(true);

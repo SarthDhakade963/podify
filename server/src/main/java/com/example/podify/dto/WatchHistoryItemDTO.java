@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
-
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor

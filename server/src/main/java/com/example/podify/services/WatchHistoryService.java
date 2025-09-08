@@ -13,6 +13,8 @@ public interface WatchHistoryService {
 
     void saveOrUpdateWatchHistory(WatchHistoryItemDTO watchHistoryItemDTO, String topicName);
 
+    List<PodcastDTO> getAllHistoryByTopic(String topicName);
+
     List<PodcastDTO> getIncompleteHistoryByTopic(String topicName);
 
     List<PodcastDTO> getCompletedHistoryByTopic(String topicName);

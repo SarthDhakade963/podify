@@ -96,27 +96,10 @@ export default function PlaylistsPage() {
         <div className="absolute top-1/2 right-1/4 w-24 h-24 bg-orange-600 rounded-full opacity-8 blur-lg"></div>
         <div className="absolute bottom-20 left-1/3 w-36 h-36 bg-orange-300 rounded-full opacity-3 blur-2xl"></div>
 
-        {/* Top Bar */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-800/50 relative z-10">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-gray-400 hover:text-white transition-colors"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-
-          <h2 className="text-2xl font-bold">My Playlists</h2>
-
-          <div className="text-sm text-gray-400">
-            {playlists.length}{" "}
-            {playlists.length === 1 ? "playlist" : "playlists"}
-          </div>
-        </div>
-
         {/* Content Area */}
         <div className="relative z-10 p-6 max-w-7xl mx-auto">
           {/* Header Section */}
-          <div className="mb-12">
+          <div className="mb-10">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h1 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent">

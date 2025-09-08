@@ -1,7 +1,6 @@
 package com.example.podify.controller;
 
 import com.example.podify.dto.PlaylistDTO;
-import com.example.podify.dto.PlaylistItemDTO;
 import com.example.podify.dto.PodcastDTO;
 import com.example.podify.services.PlaylistService;
 import lombok.RequiredArgsConstructor;

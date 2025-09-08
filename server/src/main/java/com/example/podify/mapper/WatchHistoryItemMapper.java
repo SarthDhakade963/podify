@@ -2,7 +2,9 @@ package com.example.podify.mapper;
 
 import com.example.podify.dto.WatchHistoryItemDTO;
 import com.example.podify.model.WatchHistoryItem;
+import org.springframework.stereotype.Component;
 
+@Component
 public class WatchHistoryItemMapper {
     public static WatchHistoryItem toEntity(WatchHistoryItemDTO watchHistoryItemDTO) {
         return WatchHistoryItem.builder()

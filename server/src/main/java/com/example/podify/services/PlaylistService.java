@@ -1,8 +1,8 @@
 package com.example.podify.services;
 
 import com.example.podify.dto.PlaylistDTO;
-import com.example.podify.dto.PlaylistItemDTO;
 import com.example.podify.dto.PodcastDTO;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
