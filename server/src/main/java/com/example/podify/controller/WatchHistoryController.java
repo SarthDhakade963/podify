@@ -1,8 +1,10 @@
 package com.example.podify.controller;
 
 import com.example.podify.dto.PodcastDTO;
+import com.example.podify.dto.TopicRecommendationDTO;
 import com.example.podify.dto.WatchHistoryItemDTO;
 import com.example.podify.services.WatchHistoryService;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +52,12 @@ public class WatchHistoryController {
         } else {
             return ResponseEntity.noContent().build(); // or return first completed podcast if you prefer
         }
+    }
+
+    @GetMapping("/recommendations")
+    public ResponseEntity<List<TopicRecommendationDTO>> getRecommendations(@RequestParam(defaultValue = "5") int limit) {
+        List<TopicRecommendationDTO> recommendations = watchHistoryService.getTopTopics(limit);
+        return ResponseEntity.ok(recommendations);
     }
 }
 

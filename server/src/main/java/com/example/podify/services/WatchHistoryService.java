@@ -1,13 +1,10 @@
 package com.example.podify.services;
 
 import com.example.podify.dto.PodcastDTO;
-import com.example.podify.dto.WatchHistoryDTO;
+import com.example.podify.dto.TopicRecommendationDTO;
 import com.example.podify.dto.WatchHistoryItemDTO;
-import com.example.podify.model.User;
-import com.example.podify.model.WatchHistory;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface WatchHistoryService {
 
@@ -20,4 +17,6 @@ public interface WatchHistoryService {
     List<PodcastDTO> getCompletedHistoryByTopic(String topicName);
 
     PodcastDTO getNextRecommendedPodcast(String topicName);
+
+    List<TopicRecommendationDTO> getTopTopics(int limit);
 }

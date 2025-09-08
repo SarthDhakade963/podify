@@ -2,13 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { fetchWithToken } from "@/lib/fetchWithToken";
-import { ChevronLeft, Folder, Music, X } from "lucide-react";
+import { ChevronLeft, Folder, X } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { Podcast } from "@/types/type";
-import PodcastCard from "@/component/PodcastCard";
-import VideoPlayer from "@/component/VideoPlayer";
-import LoadingPage from "@/component/LoadingPage";
+
+const PodcastCard = dynamic(() => import("@/component/PodcastCard"), {
+  ssr: false,
+});
+
+const VideoPlayer = dynamic(() => import("@/component/VideoPlayer"), {
+  ssr: false,
+});
+
+const LoadingPage = dynamic(() => import("@/component/LoadingPage"), {
+  ssr: false,
+});
+
 import { Button } from "@/components/ui/button";
+import dynamic from "next/dynamic";
 
 const InsideHistory = () => {
   const params = useParams();

@@ -25,6 +25,8 @@ public class WatchHistoryItem extends Auditable {
     @ToString.Exclude
     private WatchHistory watchHistory;
 
+    private Long lastWatchedAt = System.currentTimeMillis();
+
     private Long watchedAt = System.currentTimeMillis();
 
     @Builder.Default
@@ -33,4 +35,9 @@ public class WatchHistoryItem extends Auditable {
     private boolean completed;
 
     private String podcastId;
+
+    @Builder.Default
+    private int frequency = 1;
+
+    private Long sessionDuration;
 }

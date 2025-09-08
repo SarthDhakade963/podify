@@ -4,13 +4,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@headlessui/react";
-import { Plus, Music, X, Folder, Play, Menu } from "lucide-react";
+import { Plus, Music, X, Folder, Play } from "lucide-react";
 import { Playlist } from "@/types/type";
-
 
 const LoadingPage = dynamic(() => import("@/component/LoadingPage"), {
   ssr: false,
 });
+
 import dynamic from "next/dynamic";
 
 export default function PlaylistsPage() {

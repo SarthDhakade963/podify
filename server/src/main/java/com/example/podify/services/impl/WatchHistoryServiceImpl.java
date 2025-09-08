@@ -1,10 +1,9 @@
 package com.example.podify.services.impl;
 
 import com.example.podify.dto.PodcastDTO;
-import com.example.podify.dto.WatchHistoryDTO;
+import com.example.podify.dto.TopicRecommendationDTO;
 import com.example.podify.dto.WatchHistoryItemDTO;
 import com.example.podify.mapper.PodcastMapper;
-import com.example.podify.mapper.WatchHistoryMapper;
 import com.example.podify.model.Podcast;
 import com.example.podify.model.User;
 import com.example.podify.model.WatchHistory;
@@ -13,13 +12,14 @@ import com.example.podify.repository.jpa.UserRepository;
 import com.example.podify.repository.jpa.WatchHistoryItemRepository;
 import com.example.podify.repository.jpa.WatchHistoryRepository;
 import com.example.podify.repository.mongo.PodcastRepository;
-import com.example.podify.services.PodcastService;
 import com.example.podify.services.Signable;
 import com.example.podify.services.WatchHistoryService;
 import com.example.podify.services.YouTubeService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -177,5 +177,40 @@ public class WatchHistoryServiceImpl extends Signable implements WatchHistorySer
                 .orElse(null);
     }
 
+    @Override
+    public List<TopicRecommendationDTO> getTopTopics(int limit) {
+        User user = getLoggedInUser();
+        List<WatchHistory> watchHistories = watchHistoryRepository.findByUser(user);
 
+        return watchHistories.stream().map(
+                watchHistory -> new TopicRecommendationDTO(
+                        watchHistory.getTopicName(),
+                        calculateScore(watchHistory)
+                )).sorted((a,b) -> Float.compare(b.getScore(), a.getScore()))
+                .limit(limit)
+                .toList();
+    }
+
+    // scoring logic
+    private float calculateScore(WatchHistory watchHistory) {
+        float frequencyScore = watchHistory.getWatchCount() * 1.5f;
+        float completionScore = watchHistory.getCompletedCount() * 2f;
+        float progressScore = watchHistory.getAverageProgress();
+        float recencyScore = computeRecencyScore(watchHistory.getLastWatchedAt());
+
+        return frequencyScore + completionScore + progressScore + recencyScore;
+    }
+
+    private float computeRecencyScore(long lastWatchedAt) {
+        long now = System.currentTimeMillis();
+        long diff = now - lastWatchedAt;
+
+        if(diff < 86400000L) {
+            return 2f;
+        } else if(diff < 604800000L) {
+            return 1f;
+        }
+
+        return 0f;
+    }
 }

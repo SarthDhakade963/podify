@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { Topic } from "@/types/type";
 import dynamic from "next/dynamic";
 import { Folder, Music, Play, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const LoadingPage = dynamic(() => import("@/component/LoadingPage"), {
   ssr: false,

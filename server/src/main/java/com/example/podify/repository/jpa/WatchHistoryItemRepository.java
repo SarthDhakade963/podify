@@ -1,7 +1,6 @@
 package com.example.podify.repository.jpa;
 
 
-import com.example.podify.dto.WatchHistoryDTO;
 import com.example.podify.model.WatchHistory;
 import com.example.podify.model.WatchHistoryItem;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,4 +22,5 @@ public interface WatchHistoryItemRepository extends JpaRepository<WatchHistoryIt
 
     // Fetch the most recently incomplete podcast in a topic
     List<WatchHistoryItem> findAllByWatchHistoryAndCompletedFalseOrderByWatchedAtDesc(WatchHistory watchHistory);
+
 }

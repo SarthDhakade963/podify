@@ -13,4 +13,6 @@ import java.util.UUID;
 @Repository
 public interface WatchHistoryRepository extends JpaRepository<WatchHistory, UUID> {
     Optional<WatchHistory> findByUserAndTopicName(User user, String topicName);
+
+    List<WatchHistory> findByUser(User user);
 }

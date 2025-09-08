@@ -20,6 +20,11 @@ import { Menu, Play } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
+interface TopicRecommendationDTO {
+  topicName: string;
+  score: number;
+}
+
 export default function Dashboard() {
   const [podcasts, setPodcasts] = useState<Record<string, Podcast[]>>({});
   const [currentPodcast, setCurrentPodcast] = useState<Podcast | null>(null);
@@ -33,6 +38,7 @@ export default function Dashboard() {
   );
   const [isAddPodcastModalOpen, setIsAddPodcastModalOpen] = useState(false);
   const [topicName, setTopicName] = useState("");
+  
 
   useEffect(() => {
     const fetchingPodcast = async () => {
@@ -92,6 +98,34 @@ export default function Dashboard() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        const res = await fetchWithToken(
+          "/watch-history/recommendations?limit=12",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!res.ok) {
+          console.error("Failed to fetch recommendations", res.status);
+          return;
+        }
+
+        const data: TopicRecommendationDTO[] = await res.json();
+        setRecommendations(data);
+      } catch (error) {
+        console.error("Error fetching recommendations:", error);
+      }
+    };
+
+    fetchRecommendations();
+  }, []);
 
   const handleAddPodcastToPlaylist = async (playlistName: string) => {
     if (!selectedPodcastId) return;
@@ -236,7 +270,7 @@ export default function Dashboard() {
             <>
               {/* Player Section */}
               {currentPodcast?.videoUrl ? (
-                <div className="mb-8">
+                <div className="mb-8" ref={}>
                   <h3 className="text-xl sm:2xl font-semibold mb-4 text-orange-400">
                     Now Playing
                   </h3>
@@ -267,14 +301,14 @@ export default function Dashboard() {
               )}
 
               {/* Podcasts by Topic */}
-              {Object.entries(podcasts).map(([topic, list]) => (
+              {sortedTopics.map((topic) => (
                 <div key={topic} className="mb-12">
                   <div className="flex items-center gap-3 mb-6">
                     <h2 className="text-2xl font-bold text-white">{topic}</h2>
                     <div className="h-1 w-16 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"></div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {list.map((podcast) => (
+                    {podcasts[topic].map((podcast) => (
                       <PodcastCard
                         key={podcast.id}
                         podcast={podcast}

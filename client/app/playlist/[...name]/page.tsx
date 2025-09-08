@@ -5,9 +5,19 @@ import { fetchWithToken } from "@/lib/fetchWithToken";
 import { ChevronLeft, Folder, X } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { Podcast } from "@/types/type";
-import PodcastCard from "@/component/PodcastCard";
-import VideoPlayer from "@/component/VideoPlayer";
-import LoadingPage from "@/component/LoadingPage";
+import dynamic from "next/dynamic";
+
+const PodcastCard = dynamic(() => import("@/component/PodcastCard"), {
+  ssr: false,
+});
+
+const VideoPlayer = dynamic(() => import("@/component/VideoPlayer"), {
+  ssr: false,
+});
+
+const LoadingPage = dynamic(() => import("@/component/LoadingPage"), {
+  ssr: false,
+});
 
 const InsidePlaylist = () => {
   const params = useParams();
@@ -167,7 +177,7 @@ const InsidePlaylist = () => {
                 onPlayClick={(p) => {
                   setCurrentPodcast(p);
                 }}
-                onAddToPlaylist={(p) => {
+                onAddToPlaylist={() => {
                   console.log("Already in playlist");
                 }}
                 enablePlaylistBtn={false}
