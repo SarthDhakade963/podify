@@ -25,7 +25,7 @@ public class WatchHistoryItem extends Auditable {
     @ToString.Exclude
     private WatchHistory watchHistory;
 
-    private Long watchedAt = System.currentTimeMillis();
+    private Long watchedAt;
 
     @Builder.Default
     private float progress = 0;
@@ -33,4 +33,7 @@ public class WatchHistoryItem extends Auditable {
     private boolean completed;
 
     private String podcastId;
+
+    @Builder.Default
+    private int frequency = 1;
 }

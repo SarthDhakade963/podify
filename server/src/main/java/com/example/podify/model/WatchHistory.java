@@ -27,6 +27,14 @@ public class WatchHistory extends Auditable {
 
     private String topicName;
 
+    private int watchCount;
+
+    private float averageProgress;
+
+    private long lastWatchedAt;
+
+    private int completedCount;
+
     @OneToMany(mappedBy = "watchHistory", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WatchHistoryItem> watchHistoryItems = new ArrayList<>();
 

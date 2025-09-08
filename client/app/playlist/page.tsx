@@ -130,9 +130,6 @@ export default function PlaylistsPage() {
                 <div className="w-32 h-32 bg-gradient-to-br from-orange-500/20 to-orange-600/20 rounded-full mx-auto flex items-center justify-center border-2 border-orange-500/30">
                   <Music className="w-16 h-16 text-orange-400" />
                 </div>
-                <div className="absolute -top-4 -right-4 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-                  <Plus className="w-4 h-4 text-black" />
-                </div>
               </div>
 
               <h3 className="text-3xl font-bold text-white mb-4">

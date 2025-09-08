@@ -71,6 +71,7 @@ public class WatchHistoryServiceImpl extends Signable implements WatchHistorySer
             watchHistoryItem.setProgress(watchHistoryItemDTO.getProgress());
             watchHistoryItem.setWatchedAt(watchHistoryItemDTO.getWatchedAt());
             watchHistoryItem.setCompleted(watchHistoryItemDTO.getProgress() >= 95);
+
         } else {
             // Create new item
             watchHistoryItem = WatchHistoryItem.builder()
@@ -82,6 +83,16 @@ public class WatchHistoryServiceImpl extends Signable implements WatchHistorySer
                     .build();
             watchHistory.getWatchHistoryItems().add(watchHistoryItem);
         }
+
+        // ===== Update WatchHistory fields =====
+        List<WatchHistoryItem> items = watchHistory.getWatchHistoryItems();
+        watchHistory.setWatchCount(items.size());
+        watchHistory.setCompletedCount((int) items.stream().filter(WatchHistoryItem::isCompleted).count());
+        watchHistory.setAverageProgress((float) items.stream()
+                .mapToDouble(WatchHistoryItem::getProgress)
+                .average()
+                .orElse(0));
+        watchHistory.setLastWatchedAt(watchHistoryItemDTO.getWatchedAt());
 
         watchHistoryRepository.save(watchHistory);
     }

@@ -20,6 +20,17 @@ import { Menu, Play } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
+interface TopicRecommendationDTO {
+  topicName: string;
+  score: number;
+}
+
+interface watchHistoryItemDTO {
+  podcastId: string;
+  watchedAt: number;
+  progress: number;
+}
+
 export default function Dashboard() {
   const [podcasts, setPodcasts] = useState<Record<string, Podcast[]>>({});
   const [currentPodcast, setCurrentPodcast] = useState<Podcast | null>(null);
@@ -34,6 +45,17 @@ export default function Dashboard() {
   const [isAddPodcastModalOpen, setIsAddPodcastModalOpen] = useState(false);
   const [topicName, setTopicName] = useState("");
   const videoPlayerRef = useRef<HTMLDivElement>(null);
+
+  const [recommendations, setRecommendations] = useState<
+    TopicRecommendationDTO[]
+  >([]);
+  const lastProgressRef = useRef<Record<string, number>>({});
+
+  const sortedTopics = Object.keys(podcasts).sort((a, b) => {
+    const recA = recommendations.find((r) => r.topicName === a)?.score || 0;
+    const recB = recommendations.find((r) => r.topicName === b)?.score || 0;
+    return recB - recA; // descending order
+  });
 
   useEffect(() => {
     const fetchingPodcast = async () => {
@@ -110,7 +132,7 @@ export default function Dashboard() {
         console.error("Failed to add podcast", res.status);
         return;
       }
-      const data = await res.text();
+      // const data = await res.text();
 
       setIsAddPodcastModalOpen(false);
       setSelectedPodcastId(null);
@@ -138,15 +160,15 @@ export default function Dashboard() {
   const handleAddPodcastToHistory = async (
     podcast: Podcast,
     topicName: string,
-    progress: number
+    progress: number,
+    watchedAt: number
   ) => {
     try {
-      const watchHistoryItem = {
+      // Build the payload dynamically
+      const watchHistoryItem: watchHistoryItemDTO = {
         podcastId: podcast.id,
-        watchedAt: Date.now(),
-        completed: progress >= 95,
+        watchedAt,
         progress: progress,
-        watchHistoryDTO: null, // you can remove this if it's not required or adjust based on your API expectations
       };
 
       console.log("Topic Name", topicName);
@@ -172,9 +194,10 @@ export default function Dashboard() {
 
   const onPodcastPlay = (podcast: Podcast, topicName: string) => {
     setCurrentPodcast(podcast);
-    handleAddPodcastToHistory(podcast, topicName, 0); // starting with 0% progress
+    const watchedAt = Date.now();
+    handleAddPodcastToHistory(podcast, topicName, 0, watchedAt); // when podcast play then progress 0 and time at which podcasts plays
 
-    // scroll up to the video player container
+    // scroll up to the video player container when the podcast
     videoPlayerRef.current?.scrollIntoView({
       behavior: "smooth",
       block: "start",
@@ -186,7 +209,18 @@ export default function Dashboard() {
     topicName: string,
     progress: number
   ) => {
-    handleAddPodcastToHistory(podcast, topicName, progress);
+    const key = `${topicName}-${podcast.id}`;
+    const lastProgress = lastProgressRef.current[key] ?? -1;
+
+    // only update when progress increased by 0.99
+    if (progress > lastProgress + 0.99) {
+      // send the same watchedAt as when the podcast started
+      const watchedAt =
+        lastProgressRef.current[`${key}-watchedAt`] ?? Date.now();
+      handleAddPodcastToHistory(podcast, topicName, progress, watchedAt);
+      lastProgressRef.current[key] = progress;
+      lastProgressRef.current[`${key}-watchedAt`] = watchedAt;
+    }
   };
 
   return (
@@ -224,12 +258,7 @@ export default function Dashboard() {
 
             {/* Desktop Sidebar Toggle Button */}
 
-            <h2 className="text-2xl font-bold">
-              {activeTab === "home" && "Discover Podcasts"}
-              {activeTab === "playlist" && "My Playlists"}
-              {activeTab === "history" && "Watch History"}
-              {activeTab === "settings" && "Settings"}
-            </h2>
+            <h2 className="text-2xl font-bold">Discover Podcasts</h2>
           </div>
 
           <div className="text-sm text-gray-400">
@@ -281,17 +310,13 @@ export default function Dashboard() {
                     <div className="h-1 w-16 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"></div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {list.slice(0, 3).map((podcast) => (
+                    {podcasts[topic].map((podcast) => (
                       <PodcastCard
                         key={podcast.id}
                         podcast={podcast}
                         onPlayClick={(p) => {
                           setCurrentPodcast(p);
                           setTopicName(topic);
-                          videoPlayerRef.current?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                          });
                         }}
                         onAddToPlaylist={(p) => {
                           setSelectedPodcastId(p.id);
