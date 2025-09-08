@@ -18,7 +18,7 @@ import { Playlist, Podcast } from "@/types/type";
 import { Dialog } from "@headlessui/react";
 import { Menu, Play } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Dashboard() {
   const [podcasts, setPodcasts] = useState<Record<string, Podcast[]>>({});
@@ -33,6 +33,7 @@ export default function Dashboard() {
   );
   const [isAddPodcastModalOpen, setIsAddPodcastModalOpen] = useState(false);
   const [topicName, setTopicName] = useState("");
+  const videoPlayerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchingPodcast = async () => {
@@ -172,6 +173,12 @@ export default function Dashboard() {
   const onPodcastPlay = (podcast: Podcast, topicName: string) => {
     setCurrentPodcast(podcast);
     handleAddPodcastToHistory(podcast, topicName, 0); // starting with 0% progress
+
+    // scroll up to the video player container
+    videoPlayerRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   };
 
   const onProgressUpdate = (
@@ -236,7 +243,7 @@ export default function Dashboard() {
             <>
               {/* Player Section */}
               {currentPodcast?.videoUrl ? (
-                <div className="mb-8">
+                <div className="mb-8" ref={videoPlayerRef}>
                   <h3 className="text-xl sm:2xl font-semibold mb-4 text-orange-400">
                     Now Playing
                   </h3>
@@ -274,13 +281,17 @@ export default function Dashboard() {
                     <div className="h-1 w-16 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"></div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {list.map((podcast) => (
+                    {list.slice(0, 3).map((podcast) => (
                       <PodcastCard
                         key={podcast.id}
                         podcast={podcast}
                         onPlayClick={(p) => {
                           setCurrentPodcast(p);
                           setTopicName(topic);
+                          videoPlayerRef.current?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          });
                         }}
                         onAddToPlaylist={(p) => {
                           setSelectedPodcastId(p.id);

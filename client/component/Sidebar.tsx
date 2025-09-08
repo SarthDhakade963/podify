@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { MouseEvent, useEffect } from "react";
 import {
   X,
   Home,
@@ -12,6 +12,7 @@ import {
   LucideIcon,
 } from "lucide-react";
 import { SidebarProps } from "@/types/type";
+import { signOut, useSession } from "next-auth/react";
 
 export type SidebarItem = {
   id: string;
@@ -39,6 +40,7 @@ const Sidebar = ({
   sidebarCollapsed,
   setSidebarCollapsed,
 }: SidebarProps) => {
+  const { data: session } = useSession();
   const router = useRouter();
   // Close sidebar on escape key
   useEffect(() => {
@@ -64,6 +66,11 @@ const Sidebar = ({
       document.body.style.overflow = "unset";
     };
   }, [sidebarOpen]);
+
+  function handleSignOut(event: MouseEvent): void {
+    signOut();
+    router.push("/");
+  }
 
   return (
     <>
@@ -209,20 +216,57 @@ const Sidebar = ({
                 sidebarCollapsed ? "lg:justify-center" : "gap-3"
               }`}
             >
-              <div className="w-10 h-10 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full flex items-center justify-center font-bold text-black flex-shrink-0">
-                U
+              {/* Avatar */}
+              <div className="relative w-10 h-10 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 rounded-full flex items-center justify-center font-bold text-black flex-shrink-0 shadow-lg ring-2 ring-orange-400/30">
+                {session?.user.email?.charAt(0).toUpperCase()}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/10 to-transparent"></div>
               </div>
+
+              {/* User Info and Sign Out */}
               {!sidebarCollapsed && (
-                <div className="flex-1 min-w-0">
-                  <p className="text-white font-medium text-sm truncate">
-                    User Name
-                  </p>
-                  <p className="text-gray-400 text-xs truncate">
-                    Premium Member
-                  </p>
+                <div className="flex-1 min-w-0 flex items-center justify-between">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-white font-medium text-sm truncate">
+                      {session?.user.email}
+                    </p>
+                    <p className="text-gray-400 text-xs">Active session</p>
+                  </div>
+
+                  {/* Enhanced Sign Out Button */}
+                  <button
+                    onClick={handleSignOut}
+                    className="ml-3 px-3 py-1.5 text-xs font-medium text-gray-300 hover:text-white bg-gray-800/50 hover:bg-gray-700/70 border border-gray-700/50 hover:border-gray-600/50 rounded-md transition-all duration-200 ease-in-out hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:ring-offset-2 focus:ring-offset-gray-900"
+                  >
+                    Sign Out
+                  </button>
                 </div>
               )}
             </div>
+
+            {/* Collapsed State Tooltip/Sign Out */}
+            {sidebarCollapsed && (
+              <div className="hidden lg:block mt-2">
+                <button
+                  onClick={() => signOut()}
+                  className="w-full p-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-md transition-all duration-200 group"
+                  title="Sign Out"
+                >
+                  <svg
+                    className="w-4 h-4 mx-auto group-hover:scale-110 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
