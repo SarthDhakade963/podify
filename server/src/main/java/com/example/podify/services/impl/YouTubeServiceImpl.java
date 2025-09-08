@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -85,14 +86,20 @@ public class YouTubeServiceImpl implements YouTubeService {
             }
         }).filter(Objects::nonNull).toList();
 
-        // Save only if podcast doesn't exist
-        List<Podcast> newPodcasts = podcastDTOS.stream()
-                .filter(p -> !podcastRepository.existsById(p.getId()))
-                .map(PodcastMapper::toEntity)
-                .toList();
+        Instant now = Instant.now();
 
-        if (!newPodcasts.isEmpty()) {
-            podcastRepository.saveAll(newPodcasts);
+
+        for (PodcastDTO dto : podcastDTOS) {
+            podcastRepository.findById(dto.getId()).ifPresentOrElse(existingPodcast -> {
+                // Update existing podcast's lastFetchedAt
+                existingPodcast.setLastFetchedAt(now);
+                podcastRepository.save(existingPodcast);
+            }, () -> {
+                // Create new podcast
+                Podcast newPodcast = PodcastMapper.toEntity(dto);
+                newPodcast.setLastFetchedAt(now);
+                podcastRepository.save(newPodcast);
+            });
         }
 
         return podcastDTOS;

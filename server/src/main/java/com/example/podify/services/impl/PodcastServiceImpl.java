@@ -12,6 +12,8 @@ import com.example.podify.services.Signable;
 import com.example.podify.services.YouTubeService;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
@@ -41,11 +43,16 @@ public class PodcastServiceImpl extends Signable implements PodcastService {
             List<Podcast> list = podcastRepository.findTop3ByTopicNameOrderByCreatedAtDesc(topicName);
 
             // if podcast aren't in db
-            if (list.isEmpty()) {
-                // then fetched from yt
-                List<PodcastDTO> fetched = youTubeService.fetchAndSavePodcasts(topicName);
-
-                res.put(topicName, fetched);
+            if (list.isEmpty() || isStale(list)) {
+               try {
+                   // then fetched from yt
+                   List<PodcastDTO> fetched = youTubeService.fetchAndSavePodcasts(topicName);
+                   res.put(topicName, fetched);
+               } catch (Exception e) {
+                   System.err.println("Error fetching podcasts for topic " + topicName + ": " + e.getMessage());
+                   List<PodcastDTO> dtos = list.stream().map(PodcastMapper::toDTO).toList();
+                   res.put(topicName, dtos);
+               }
             } else {
                 // if it is in DB then send that
                 List<PodcastDTO> dtos = list.stream().map(PodcastMapper::toDTO).toList();
@@ -53,6 +60,12 @@ public class PodcastServiceImpl extends Signable implements PodcastService {
             }
         }
         return res;
+    }
+
+    private boolean isStale(List<Podcast> podcasts) {
+        if (podcasts.isEmpty()) return true;
+        Instant latest = podcasts.getFirst().getLastFetchedAt();
+        return latest.isBefore(Instant.now().minus(24, ChronoUnit.HOURS));
     }
 
     @Override
