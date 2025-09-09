@@ -1,0 +1,33 @@
+spring.application.name=podify
+
+# ===== Database (PostgreSQL) Configuration =====
+spring.datasource.url=jdbc:postgresql://localhost:5432/your-db-name
+spring.datasource.username=your-db-usernmae
+spring.datasource.password=your-db-password
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.format_sql=true
+
+
+# ===============================
+# MongoDB Config
+# ===============================
+spring.data.mongodb.uri=mongodb://localhost:27017/your-mongodb-name
+
+# ===== OAuth Client Configuration =====
+# Google OAuth
+spring.security.oauth2.client.registration.google.client-id=your-google-client-id
+spring.security.oauth2.client.registration.google.client-secret=your-google-client-secret
+spring.security.oauth2.client.registration.google.redirect-uri=your-google-redirect-uri
+spring.security.oauth2.client.registration.google.scope=your-google-api-scope
+spring.security.oauth2.client.registration.google.authorization-grant-type=your-google-authorization-type
+
+next.auth.secret=your-next-auth-secret
+
+client.url=your-frontend-url
+
+base.url=your-backend-url
+
+#Youtube
+youtube.api.key=your-yt-api-key
