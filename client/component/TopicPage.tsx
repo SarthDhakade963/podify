@@ -8,38 +8,58 @@ import { useSession } from "next-auth/react";
 import { fetchWithToken } from "@/lib/fetchWithToken";
 
 const topicsList: Topic[] = [
-  { name: "Technology", emoji: "💻", description: "AI, gadgets, innovation" },
-  { name: "Health", emoji: "🏥", description: "Wellness, fitness, medicine" },
+  {
+    name: "Technology",
+    emoji: "💻",
+    description: "AI, gadgets, innovation",
+    id: "tech",
+  },
+  {
+    name: "Health",
+    emoji: "🏥",
+    description: "Wellness, fitness, medicine",
+    id: "health",
+  },
   {
     name: "Business",
     emoji: "💼",
     description: "Entrepreneurship, finance, leadership",
+    id: "business",
   },
   {
     name: "Education",
     emoji: "📚",
     description: "Learning, teaching, academia",
+    id: "edu",
   },
-  { name: "Entertainment", emoji: "🎭", description: "Movies, music, culture" },
+  {
+    name: "Entertainment",
+    emoji: "🎭",
+    description: "Movies, music, culture",
+    id: "entertainment",
+  },
   {
     name: "Sports",
     emoji: "⚽",
     description: "Athletics, competitions, teams",
+    id: "sports",
   },
   {
     name: "Science",
     emoji: "🔬",
     description: "Research, discoveries, experiments",
+    id: "sci",
   },
   {
     name: "History",
     emoji: "📜",
     description: "Past events, civilizations, stories",
+    id: "hist",
   },
 ];
 
 const TopicPage = () => {
-  const {  status } = useSession();
+  const { status } = useSession();
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
