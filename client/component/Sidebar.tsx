@@ -68,8 +68,12 @@ const Sidebar = ({
   }, [sidebarOpen]);
 
   function handleSignOut(event: MouseEvent): void {
-    signOut();
-    router.push("/");
+    event.preventDefault();
+
+    signOut({
+      redirect: true,
+      callbackUrl: "/home",
+    });
   }
 
   return (
