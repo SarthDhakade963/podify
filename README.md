@@ -5,11 +5,13 @@
 **Podify** is a next-gen podcast platform that delivers **personalized, curated podcasts** based on your interests. It tracks your listening habits, fetches relevant podcasts from YouTube, and refreshes content daily—ensuring a seamless and engaging listening experience.
 
 ## 🎬 Preview
-
+### Home
 ![Podify Preview](client/public/image1.png)
 
+### Login
 ![Podify Preview](client/public/image2.png)
 
+### Dashboard
 ![Podify Preview](client/public/image3.png)
 
 ## 🛠 Tech Stack
